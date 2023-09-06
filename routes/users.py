@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from config.db import conn
 from models.user import users
-from schemas.user import User
+from schemas.user import User, Login
 from cryptography.fernet import Fernet
 
 key = Fernet.generate_key()
@@ -22,5 +22,15 @@ def create_user(user: User):
                 "age": user.age,
                 "height": user.height,
                 "weight": user.weight}
-    print(new_user)
+    result = conn.execute(users.insert().values(new_user))
+    print(result)
     return "Hello World"
+
+
+@user.post("/login")
+def sign_in(login: Login):
+    signin = {"username": login.user_name,
+              "email": login.user_mail}
+    signin["password"] = f.encrypt(login.password.encode("utf-8"))
+    print(signin)
+    return "Registro exitoso"
