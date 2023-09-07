@@ -34,3 +34,6 @@ def sign_in(login: Login):
     signin["password"] = f.encrypt(login.password.encode("utf-8"))
     print(signin)
     return "Registro exitoso"
+
+
+# Para todos los 'return' definir un estandar de las respuestas que se van a mandar
