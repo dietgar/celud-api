@@ -1,4 +1,5 @@
 from sqlalchemy import Table, Column
+from datetime import date
 from sqlalchemy.sql.sqltypes import Integer, String, Float
 from config.db import meta, engine
 
@@ -9,8 +10,6 @@ users = Table("users", meta,
               Column("first_name", String(255)),
               Column("last_name", String(255)),
               Column("age", Integer),
-              #   en lugar de age que sea birthday de tipo Date
-              # seria bueno agregar un campo para el tipo de sangre
               Column("height", Float),
               Column("weight", Float))
 

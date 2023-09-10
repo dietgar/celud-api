@@ -22,9 +22,9 @@ def create_user(user: User):
                 "age": user.age,
                 "height": user.height,
                 "weight": user.weight}
-    result = conn.execute(users.insert().values(new_user))
-    print(result)
-    return "Hello World"
+    # result = conn.execute(users.insert().values(new_user))
+    print(new_user)
+    return "204"
 
 
 @user.post("/login")
