@@ -15,7 +15,7 @@ def get_users():
     return conn.execute(users.select()).fetchall()
 
 
-@user.post("/users")
+@user.post("/sigin")
 def create_user(user: User):
     new_user = {"first_name": user.first_name,
                 "last_name": user.last_name,
@@ -25,15 +25,3 @@ def create_user(user: User):
     # result = conn.execute(users.insert().values(new_user))
     print(new_user)
     return "204"
-
-
-@user.post("/login")
-def sign_in(login: Login):
-    signin = {"username": login.user_name,
-              "email": login.user_mail}
-    signin["password"] = f.encrypt(login.password.encode("utf-8"))
-    print(signin)
-    return "Registro exitoso"
-
-
-# Para todos los 'return' definir un estandar de las respuestas que se van a mandar

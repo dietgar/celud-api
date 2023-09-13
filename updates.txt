@@ -1,0 +1,28 @@
+# seria bueno definir una tabla para los roles
+
+# deberian tener una relacion con users
+
+# allergy es una tabla nueva, diseases tambien y drugs tambien
+
+# sintomas -> enfermedad
+# medicamento -> enfermedad
+
+# deberia tener una relacion con el usuario
+
+# va a ser necesario guardar los resultados de la visita medica ->
+# seria bueno guardar: frecuencia cardiaca, presion, peso
+
+# saber si van a guardar los doctores o no?
+# van a tener un catalogo de las clinicas? -> clinica es una nueva tabla
+# tener un catalogo de la informacion de las clinicas, teniendo la direccion
+# informacion sobre las especialidades de la clinica
+# seria bueno por ejemplo hacer una especie de rate sobre las clinicas o doctores
+# tener informacion sobre la especialidad a la que se relaciona la cita
+
+# seria bueno crear una especie de calendario o recordatorios para los medicamentos
+
+
+# normalmente no se suelen elimminar los datos, sino que se pasan a algun estado inactivo ->
+# todas las tablas deberian de tener una columna llamada status o estado
+
+# Para todos los 'return' definir un estandar de las respuestas que se van a mandar
