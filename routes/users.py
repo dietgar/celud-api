@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from config.db import conn
-from models.user import users
-from schemas.user import User, Login
+from models.user import logins
+from schemas.user import Login
 from cryptography.fernet import Fernet
 
 key = Fernet.generate_key()
@@ -12,16 +12,14 @@ user = APIRouter()
 
 @user.get('/users')
 def get_users():
-    return conn.execute(users.select()).fetchall()
+    return conn.execute(logins.select()).fetchall()
 
 
-@user.post("/sigin")
-def create_user(user: User):
-    new_user = {"first_name": user.first_name,
-                "last_name": user.last_name,
-                "age": user.age,
-                "height": user.height,
-                "weight": user.weight}
-    # result = conn.execute(users.insert().values(new_user))
-    print(new_user)
-    return "204"
+@user.post("/users")
+def create_user(login: Login):
+    new_user = {"user_name": login.user_name,
+                "user_mail": login.user_mail}
+    new_user["password"] = f.encrypt(login.password.encode("utf-8"))
+    conn.execute(logins.insert().values(new_user))
+    conn.commit()
+    return new_user
