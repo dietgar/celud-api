@@ -11,12 +11,12 @@ user = APIRouter()
 
 
 @user.get('/users')
-def get_users():
+async def get_users():
     return conn.execute(logins.select()).fetchall()
 
 
 @user.post("/users")
-def create_user(login: Login):
+async def create_user(login: Login):
     new_user = {"user_name": login.user_name,
                 "user_mail": login.user_mail}
     new_user["password"] = f.encrypt(login.password.encode("utf-8"))
