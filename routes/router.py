@@ -38,12 +38,22 @@ def get_user(user_id: int):
 @user.post("/users", status_code=HTTP_201_CREATED)
 def create_user(data_user: UserSchema):
     with engine.connect() as conn:
-        new_user = dict(data_user)
-        new_user["user_password"] = generate_password_hash(
-            data_user.user_password, "pbkdf2:sha256:30", 30)
-        conn.execute(users.insert().values(new_user))
-        conn.commit()
-    return Response(status_code=HTTP_201_CREATED)
+        result = conn.execute(users.select().where(
+            users.c.user_name == data_user.user_name)).first()
+        if result != None:
+            check_exist = data_user.user_name == result[1]
+            if check_exist:
+                return {
+                    "status": "HTTP_200_OK",
+                    "message": "User already exist"
+                }
+        else:
+            new_user = dict(data_user)
+            new_user["user_password"] = generate_password_hash(
+                data_user.user_password, "pbkdf2:sha256:30", 30)
+            conn.execute(users.insert().values(new_user))
+            conn.commit()
+            return Response(status_code=HTTP_201_CREATED)
 
 # Ruta que simula un inicio de sesion a traves de user_name y user_password
 
