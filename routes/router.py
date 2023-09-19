@@ -8,12 +8,16 @@ from typing import List
 
 user = APIRouter()
 
+# Ruta que devuelve todos los usuarios de la db
+
 
 @user.get("/users", response_model=List[UserSchema])
 def get_users():
     with engine.connect() as conn:
         result = conn.execute(users.select()).fetchall()
         return result
+
+# Ruta que devuelve un usuario por su ID
 
 
 @user.get("/users/{user_id}")
@@ -28,6 +32,8 @@ def get_user(user_id: int):
         "message": "User doesn't exist"
     }
 
+# Ruta que permite crear usuarios
+
 
 @user.post("/users", status_code=HTTP_201_CREATED)
 def create_user(data_user: UserSchema):
@@ -38,6 +44,8 @@ def create_user(data_user: UserSchema):
         conn.execute(users.insert().values(new_user))
         conn.commit()
     return Response(status_code=HTTP_201_CREATED)
+
+# Ruta que simula un inicio de sesion a traves de user_name y user_password
 
 
 @user.post("/users/login", status_code=HTTP_202_ACCEPTED)
@@ -61,6 +69,8 @@ def user_login(data_user: Login):
             "message": "Access denied"
         }
 
+# Ruta que permite actualizar un usuario a traves de su ID
+
 
 @user.put("/users/{user_id}", response_model=UserSchema)
 def update_user(data_update: UserSchema, user_id: int):
@@ -73,6 +83,8 @@ def update_user(data_update: UserSchema, user_id: int):
         result = conn.execute(users.select().where(
             users.c.id == user_id)).first()
     return result
+
+# Ruta que permite eliminar usuarios por ID
 
 
 @user.delete("/users/{user_id}", status_code=HTTP_200_OK)
