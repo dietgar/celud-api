@@ -8,10 +8,15 @@ from typing import List
 
 user = APIRouter()
 
+
+@user.get("/")
+def root():
+    return {"message": "Hola, estas usando la Celud-API!"}
+
 # Ruta que devuelve todos los usuarios de la db
 
 
-@user.get("/users", response_model=List[UserSchema])
+@user.get("/api/users", response_model=List[UserSchema])
 def get_users():
     with engine.connect() as conn:
         result = conn.execute(users.select()).fetchall()
@@ -20,22 +25,15 @@ def get_users():
 # Ruta que devuelve un usuario por su ID
 
 
-@user.get("/users/{user_id}")
+@user.get("/api/users/{user_id}", response_model=UserSchema)
 def get_user(user_id: int):
     with engine.connect() as conn:
         result = conn.execute(users.select().where(
-            users.c.id == user_id)).first
-    if result:
-        return dict(result._asdict())
-    return {
-        "status": HTTP_404_NOT_FOUND,
-        "message": "User doesn't exist"
-    }
-
-# Ruta que permite crear usuarios
+            users.c.id == user_id)).first()
+        return result
 
 
-@user.post("/users", status_code=HTTP_201_CREATED)
+@user.post("/api/users", status_code=HTTP_201_CREATED)
 def create_user(data_user: UserSchema):
     with engine.connect() as conn:
         result = conn.execute(users.select().where(
@@ -52,13 +50,13 @@ def create_user(data_user: UserSchema):
             new_user["user_password"] = generate_password_hash(
                 data_user.user_password, "pbkdf2:sha256:30", 30)
             conn.execute(users.insert().values(new_user))
-            conn.commit()
+            # conn.commit()
             return Response(status_code=HTTP_201_CREATED)
 
 # Ruta que simula un inicio de sesion a traves de user_name y user_password
 
 
-@user.post("/users/login", status_code=HTTP_202_ACCEPTED)
+@user.post("/api/users/login", status_code=HTTP_202_ACCEPTED)
 def user_login(data_user: Login):
     with engine.connect() as conn:
         result = conn.execute(users.select().where(
@@ -82,14 +80,14 @@ def user_login(data_user: Login):
 # Ruta que permite actualizar un usuario a traves de su ID
 
 
-@user.put("/users/{user_id}", response_model=UserSchema)
+@user.put("/api/users/{user_id}", response_model=UserSchema)
 def update_user(data_update: UserSchema, user_id: int):
     with engine.connect() as conn:
         encrypt_password = generate_password_hash(
             data_update.user_password, "pbkdf2:sha256:30", 30)
         conn.execute(users.update().values(user_name=data_update.user_name, user_mail=data_update.user_mail,
                                            user_password=encrypt_password).where(users.c.id == user_id))
-        conn.commit()
+        # conn.commit()
         result = conn.execute(users.select().where(
             users.c.id == user_id)).first()
     return result
@@ -97,9 +95,9 @@ def update_user(data_update: UserSchema, user_id: int):
 # Ruta que permite eliminar usuarios por ID
 
 
-@user.delete("/users/{user_id}", status_code=HTTP_200_OK)
+@user.delete("/api/users/{user_id}", status_code=HTTP_200_OK)
 def delete_user(user_id: int):
     with engine.connect() as conn:
         conn.execute(users.delete().where(users.c.id == user_id))
-        conn.commit()
+        # conn.commit()
     return Response(status_code=HTTP_200_OK)
