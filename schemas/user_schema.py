@@ -13,5 +13,5 @@ class UserSchema(BaseModel):
 
 
 class Login(BaseModel):
-    user_name: str
+    user_mail: str
     user_password: str

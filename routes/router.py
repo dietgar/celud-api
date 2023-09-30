@@ -2,11 +2,22 @@ from fastapi import APIRouter, Response
 from config.db import engine
 from models.user import users
 from schemas.user_schema import Login, UserSchema
-from starlette.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED
+from starlette.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import List
+import re
+from validate_email import validate_email
 
 user = APIRouter()
+
+# Verificar que el correo representa una direccion valida
+
+
+def check_email(email):
+    pattern = "^[a-zA-Z0-9-_]+@[a-zA-Z0-9]+\.[a-z]{1,3}$"
+    if re.match(pattern, email):
+        return True
+    return False
 
 
 @user.get("/")
@@ -25,34 +36,43 @@ def get_users():
 # Ruta que devuelve un usuario por su ID
 
 
-@user.get("/api/users/{user_id}", response_model=UserSchema)
+@user.get("/api/users/{user_id}")
 def get_user(user_id: int):
     with engine.connect() as conn:
         result = conn.execute(users.select().where(
             users.c.id == user_id)).first()
-        return result
+        if result != None:
+            return result
+        return {
+            "status": 404,
+            "message": "User doesn't exist"
+        }
 
 
-@user.post("/api/users", status_code=HTTP_201_CREATED)
+@user.post("/api/users")
 def create_user(data_user: UserSchema):
     with engine.connect() as conn:
         result = conn.execute(users.select().where(
-            users.c.user_name == data_user.user_name)).first()
-        if result != None:
-            check_exist = data_user.user_name == result[1]
-            if check_exist:
-                return {
-                    "status": "HTTP_200_OK",
-                    "message": "User already exist"
-                }
-        else:
-            new_user = dict(data_user)
-            new_user["user_password"] = generate_password_hash(
-                data_user.user_password, "pbkdf2:sha256:30", 30)
-            conn.execute(users.insert().values(new_user))
-            # conn.commit()
-            return Response(status_code=HTTP_201_CREATED)
-
+            users.c.user_mail == data_user.user_mail)).first()
+        if validate_email(data_user.user_mail):
+            if result != None:
+                check_exist = data_user.user_mail == result[2]
+                if check_exist:
+                    return {
+                        "status": "HTTP_200_OK",
+                        "message": "Email address already in use"
+                    }
+            else:
+                new_user = dict(data_user)
+                new_user["user_password"] = generate_password_hash(
+                    data_user.user_password, "pbkdf2:sha256:30", 30)
+                conn.execute(users.insert().values(new_user))
+                # conn.commit()
+                return new_user
+        return {
+            "status": 400,
+            "detail": "The email address is not valid"
+        }
 # Ruta que simula un inicio de sesion a traves de user_name y user_password
 
 
@@ -60,7 +80,7 @@ def create_user(data_user: UserSchema):
 def user_login(data_user: Login):
     with engine.connect() as conn:
         result = conn.execute(users.select().where(
-            users.c.user_name == data_user.user_name)).first()
+            users.c.user_mail == data_user.user_mail)).first()
 
         if result != None:
             check_password = check_password_hash(
