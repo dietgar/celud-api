@@ -2,13 +2,12 @@ from sqlalchemy import Table, Column, Integer, String, Date, Float, Boolean, For
 from config.db import meta, engine
 
 
-# Tabla user
 user = Table("user", meta,
              Column("id", Integer, primary_key=True, autoincrement=True),
              Column("first_name", String(50), nullable=False),
-             Column('middle_name', String(50), nullable=False),
+             Column('middle_name', String(50), nullable=True),
              Column('last_name', String(50), nullable=False),
-             Column('second_last_name', String(50), nullable=False),
+             Column('second_last_name', String(50), nullable=True),
              Column('username', String(50), nullable=False),
              Column('email', String(50), nullable=False),
              Column('password', String(255), nullable=False)
@@ -18,12 +17,12 @@ user = Table("user", meta,
 #                   Column('birth_date', Date, nullable=False),
 #                   Column('heigth', Float, nullable=False),
 #                   Column('weigth', Float, nullable=False),
-#                   # Column('id_blood_type', Integer, ForeignKey(
-#                   #    'blood_type.id_blood_type')),
+#                   Column('id_blood_type', Integer, ForeignKey(
+#                       'blood_type.id_blood_type')),
 #                   Column('status_', Boolean, nullable=False)
 #                   )
 
-# Tabla blood_type
+
 # blood_type = Table('blood_type', meta,
 #                    Column('id_blood_type', Integer,
 #                           primary_key=True, autoincrement=True),

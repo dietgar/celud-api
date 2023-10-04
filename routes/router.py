@@ -1,168 +1,87 @@
 from fastapi import APIRouter
 from config.db import engine
 from models.user import user
-from schemas.user_schema import Register
+from schemas.user_schema import Register, Login
 from starlette.status import *
 from werkzeug.security import generate_password_hash, check_password_hash
-# from typing import List
 import re
+from validations.user_data import *
+# from typing import List
 
 root = APIRouter()
-
-
-def format_name(name):
-    try:
-        delete_white_spaces = name.replace(" ", "")
-        name_to_minus = delete_white_spaces.casefold()
-        name_to_capitalize = name_to_minus.capitalize()
-        return name_to_capitalize
-    except:
-        return False
-
-
-def validate_names(name):
-    try:
-        if len(name) > 0 and len(name) < 50:
-            number = False
-            digit = False
-            if re.search(r'\d', name):
-                number = True
-            if re.search(r'[!@#$%^&*(),.?":{}|<>]', name):
-                digit = True
-            if not digit and number:
-                return False
-            return True
-    except:
-        return False
-
-
-def exist_username(username):
-    with engine.connect() as conn:
-        result = conn.execute(user.select().where(
-            user.c.username == username)).first()
-        if result == None:
-            return True
-        return False
-
-
-def validate_username(username):
-    if len(username) > 3 and len(username) < 15:
-        if re.match(r'^[a-zA-Z0-9_-]+$', username):
-            return True
-    return {
-        "detail": "The username is already in use"
-    }
-
-
-def exist_email(email):
-    with engine.connect() as conn:
-        result = conn.execute(user.select().where(
-            user.c.email == email)).first()
-        if result == None:
-            return True
-        return {
-            "detail": "The email addres is already in use"
-        }
-
-
-def validate_email(email):
-    pattern = "^[a-zA-Z0-9-_]+@[a-zA-Z0-9]+\.[a-z]{1,3}$"
-    result = re.match(pattern, email)
-    if result:
-        return True
-    return False
-
-
-def validate_secure_password(password):
-    mayus = False
-    minus = False
-    number = False
-    digit = False
-    if len(password) >= 8 and len(password) < 50:
-        if re.search(r'[A-Z]', password):
-            mayus = True
-        if re.search(r'[a-z]', password):
-            minus = True
-        if re.search(r'\d', password):
-            number = True
-        if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-            digit = True
-        if mayus and minus and number and digit:
-            return True
-    return False
-
-
-def validate_data_user(data_user: Register):
-    try:
-        counter = 0
-        if validate_names(data_user.first_name):
-            counter += 1
-            print("primer nombre", counter)
-
-        if validate_names(data_user.middle_name):
-            counter += 1
-            print("segundo nombre", counter)
-
-        if validate_names(data_user.last_name):
-            counter += 1
-            print("apellido", counter)
-
-        if validate_names(data_user.second_last_name):
-            counter += 1
-            print("segundo apellido", counter)
-
-        if validate_email(data_user.email):
-            counter += 1
-            print("email", counter)
-
-        if validate_secure_password(data_user.password):
-            counter += 1
-            print("contra", counter)
-
-        print(counter)
-
-        if counter == 6:
-            return True
-        return False
-
-    except:
-        return {
-            "status": HTTP_400_BAD_REQUEST,
-            "message": "Unexpected error"
-        }
 
 
 @root.post("/api/users/register")
 def register(data_user: Register):
     with engine.connect() as conn:
         try:
+
+            if exist_username(data_user.username):
+                return {
+                    "detail": "Este nombre de usuario ya está en uso"
+                }
+
+            if exist_email(data_user.email):
+                print("Entra aqui")
+                return {
+                    "detail": "Este correo electrónico ya pertenece a otra cuenta"
+                }
+
             if validate_data_user(data_user):
-                if exist_username:
-                    if exist_email:
-                        new_user = dict(data_user)
-                        new_user["first_name"] = format_name(
-                            data_user.first_name)
-                        new_user["middle_name"] = format_name(
-                            data_user.middle_name)
-                        new_user["last_name"] = format_name(
-                            data_user.last_name)
-                        new_user["second_last_name"] = format_name(
-                            data_user.second_last_name)
-                        new_user["password"] = generate_password_hash(
-                            data_user.password, "pbkdf2:sha256:30", 30)
-                        print(new_user)
-                        conn.execute(user.insert().values(new_user))
-                        return new_user
-                    return {
-                        "status": HTTP_422_UNPROCESSABLE_ENTITY,
-                        "message": "The request isn't valid"
-                    }
+                print("hello")
+                new_user = dict(data_user)
+                new_user["first_name"] = format_name(data_user.first_name)
+                new_user["middle_name"] = format_name(data_user.middle_name)
+                new_user["last_name"] = format_name(data_user.last_name)
+                new_user["second_last_name"] = format_name(
+                    data_user.second_last_name)
+                new_user["password"] = generate_password_hash(
+                    data_user.password, "pbkdf2:sha256:30", 30)
+                print(new_user)
+                conn.execute(user.insert().values(new_user))
+                return new_user
+
         except:
             return {
-                "status": "",
-                "message": "Unknown error"
+                "status": HTTP_500_INTERNAL_SERVER_ERROR,
+                "message": "Ha ocurrido un error inesperado"
             }
 
+
+@root.post("/api/users/login")
+def login(user_login: Login):
+    with engine.connect() as conn:
+        try:
+            if validate_email(user_login.email):
+                result = conn.execute(user.select().where(
+                    user.c.email == user_login.email)).first()
+
+                if result != None:
+                    check_password = check_password_hash(
+                        result[7], user_login.password)
+
+                    if check_password:
+                        return {
+                            "status": HTTP_202_ACCEPTED,
+                            "detail": "Acceso exitoso!"
+                        }
+                    return {
+                        "status": HTTP_400_BAD_REQUEST,
+                        "detail": "Contraseña incorrecta"
+                    }
+                return {
+                    "status": HTTP_404_NOT_FOUND,
+                    "detail": "Correo no asignado a ninguna cuenta"
+                }
+            return {
+                "status": HTTP_400_BAD_REQUEST,
+                "detail": "Ingrese un correo electrónico válido"
+            }
+        except:
+            return {
+                "status": HTTP_500_INTERNAL_SERVER_ERROR,
+                "message": "Ha ocurrido un error inesperado"
+            }
 
 # @user.get("/")  # Esta ruta solo esta para verificar que el servidor este en linea
 # def root():
