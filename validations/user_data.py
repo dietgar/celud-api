@@ -1,40 +1,70 @@
 from schemas.user_schema import Register
+from datetime import datetime
 from config.db import engine
 from models.user import user
+import time
 import re
 
 
-def format_name(name):
-    try:
-        delete_white_spaces = name.replace(" ", "")
-        name_to_minus = delete_white_spaces.casefold()
-        name_to_capitalize = name_to_minus.capitalize()
-        return name_to_capitalize
-    except:
-        return {
-            "detail": "Ha ocurrido un error al momento de formatear el nombre"
-        }
+def format_string(name):
+    delete_white_spaces = name.replace(" ", "")
+    name_to_minus = delete_white_spaces.casefold()
+    name_to_capitalize = name_to_minus.capitalize()
+    return name_to_capitalize
 
 
-def is_empty(name):
-    if len(name) == 0:
+def format_date(date):
+    birth_date = datetime.strptime(date, "%d/%m/%Y").date()
+    return birth_date
+
+
+def validate_time(time_):
+    if time.strptime(time_, "%H:%M"):
         return True
 
 
-def validate_names(name):
-    try:
-        if len(name) > 0 and len(name) < 50:
-            number = False
-            digit = False
-            if re.search(r'\d', name):
-                number = True
-            if re.search(r'[!@#$%^&*(),.?":{}|<>]', name):
-                digit = True
-            if not digit and number:
-                return False
+def validate_date(date):
+    pattern = r'^\d{1,2}/\d{1,2}/\d{4}$'
+    result = re.search(pattern, date)
+    if result:
+        return True
+    return False
+
+
+def validate_phone_number(phone_number):
+    pattern = r'^[0-9]{8}$'
+    if re.match(pattern, phone_number):
+        return True
+    return False
+
+
+def validate_string(name):
+    if len(name) > 0 and len(name) < 50:
+        number = False
+        digit = False
+        if re.search(r'\d', name):
+            number = True
+        if re.search(r'[!@#$%^&*(),.?":{}|<>]', name):
+            digit = True
+        if not digit and number:
+            return False
+        return True
+
+
+def exist_phone_number(phone_number):
+    with engine.connect() as conn:
+        result = conn.execute(user.select().where(
+            user.c.phone_number == phone_number)).first()
+        if result is not None:
             return True
-    except:
         return False
+
+
+def validate_blood_pressure(blood_pressure):
+    pattern = r'^\d{1,3}/\d{1,3}$'
+    if re.match(pattern, blood_pressure):
+        return True
+    return False
 
 
 def exist_username(username):
@@ -90,35 +120,19 @@ def validate_secure_password(password):
 def validate_data_user(data_user: Register):
     try:
         counter = 0
-        if validate_names(data_user.first_name):
-            print(data_user.first_name)
+        if validate_string(data_user.first_name):
             counter += 1
-        if validate_names(data_user.middle_name):
-            print(data_user.middle_name)
+        if validate_string(data_user.last_name):
             counter += 1
-        if is_empty(data_user.middle_name):
-            print(data_user.middle_name)
-            counter += 1
-        if validate_names(data_user.last_name):
-            print(data_user.last_name)
-            counter += 1
-        if validate_names(data_user.second_last_name):
-            print(data_user.second_last_name)
-            counter += 1
-        if is_empty(data_user.second_last_name):
-            print(data_user.second_last_name)
+        if validate_phone_number(data_user.phone_number):
             counter += 1
         if validate_username(data_user.username):
-            print(data_user.username)
             counter += 1
         if validate_email(data_user.email):
-            print(data_user.email)
             counter += 1
         if validate_secure_password(data_user.password):
-            print(data_user.password)
             counter += 1
-        print("Contador: ", counter)
-        if counter == 7:
+        if counter == 6:
             return True
 
     except:
