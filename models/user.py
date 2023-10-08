@@ -6,7 +6,6 @@ user = Table("user", meta,
              Column("id_user", Integer, primary_key=True, autoincrement=True),
              Column("first_name", String(50), nullable=False),
              Column("last_name", String(50), nullable=False),
-             Column("phone_number", String(15), nullable=False),
              Column("username", String(50), nullable=False),
              Column("email", String(50), nullable=False),
              Column("password", String(255), nullable=False)
