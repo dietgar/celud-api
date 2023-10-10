@@ -63,7 +63,7 @@
 ## Crear un usuario
 
 - POST `/users/register` > Agregar un usuario
-
+```json
     {
       "first_name": "string",
       "last_name": "string",
@@ -71,7 +71,7 @@
       "email": "string",
       "password": "string"
     }
-
+```
 - POST `/users/login` > Iniciar sesión
 
     {
