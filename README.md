@@ -73,16 +73,16 @@
     }
 ```
 - POST `/users/login` > Iniciar sesión
-
+```json
     {
       "email": "string",
       "password": "string"
     }
-
+```
 - POST `/users/personal-data/{user_id}` > Agregar datos personales mediante id
 
     > Por ejemplo: /users/personal-data/1
-
+```json
     {
       "height": 0,
       "weight": 0,
@@ -90,49 +90,49 @@
       "blood_type": "string",
       "status_": true
     }
-
+```
 - POST `/users/user-contact/{user_id}` > Agregar contacto de emergencia mediante id
 
     > Por ejemplo: /users/user-contact/1
-
+```json
     {
       "name": "string",
       "relationship": "string",
       "phone_number": "string"
     }
-
+```
 - POST `/users/reminder/{user_id}` > Agregar un recordatorio
 
     > Por ejemplo: /users/reminder/1
-
+```json
     {
       "date_": "string",
       "time_": "string",
       "reminder_text": "string",
     }
-
+```
 - POST `/users/address/{user_id}` > Agregar una dirección
 
     > Por ejemplo: /users/address/1
-
+```json
     {
       "address": "string"
     }
-
+```
 - POST `/users/appointment/{user_id}` > Agrega una cita
 
     > Por ejemplo: /users/appointment/1
-
+```json
     {
       "appointment_date": "string",
       "appointment_place": "string",
       "clinic_name": "string"
     }
-
+```
 - POST `/users/info-appointments/{user_id}` > Agrega información de una cita
 
     > Por ejemplo: /users/info-appointments/1
-
+```json
     {
       "blood_pressure": "string",
       "temperature": "string",
@@ -141,7 +141,7 @@
       "next_appointment_date": "string",
       "observation": "string"
     }
-
+```
 - POST `/users/drug/{user_id}` > Agregar un medicamento
 
     > Por ejemplo: /users/drug/1
@@ -153,15 +153,16 @@
 - POST `/users/allergy/{user_id}` >  Agregar una alergia
 
     > Por ejemplo: /users/allergy/1
-
+```json
     {
       "allergy_name": "string"
     }
-
+```
 - POST `/users/chronic-disease/{user_id}` > Agregar una enfermedad crónica
 
     > Por ejemplo: /users/chronic-disease/1
-
+```json
     {
       "disease_name": "string"
     }
+```
