@@ -145,11 +145,11 @@
 - POST `/users/drug/{user_id}` > Agregar un medicamento
 
     > Por ejemplo: /users/drug/1
-
+```json
     {
       "drug_name": "string"
     }
-
+```
 - POST `/users/allergy/{user_id}` >  Agregar una alergia
 
     > Por ejemplo: /users/allergy/1
