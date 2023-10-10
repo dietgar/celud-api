@@ -64,8 +64,6 @@
 
 - POST `/users/register` > Agregar un usuario
 
-### Formato
-
     {
       "first_name": "string",
       "last_name": "string",
@@ -76,8 +74,6 @@
 
 - POST `/users/login` > Iniciar sesión
 
-### Formato
-
     {
       "email": "string",
       "password": "string"
@@ -87,34 +83,85 @@
 
     > Por ejemplo: /users/personal-data/1
 
+    {
+      "height": 0,
+      "weight": 0,
+      "birth_date": "string",
+      "blood_type": "string",
+      "status_": true
+    }
+
 - POST `/users/user-contact/{user_id}` > Agregar contacto de emergencia mediante id
 
     > Por ejemplo: /users/user-contact/1
+
+    {
+      "name": "string",
+      "relationship": "string",
+      "phone_number": "string"
+    }
 
 - POST `/users/reminder/{user_id}` > Agregar un recordatorio
 
     > Por ejemplo: /users/reminder/1
 
+    {
+      "date_": "string",
+      "time_": "string",
+      "reminder_text": "string",
+    }
+
 - POST `/users/address/{user_id}` > Agregar una dirección
 
     > Por ejemplo: /users/address/1
+
+    {
+      "address": "string"
+    }
 
 - POST `/users/appointment/{user_id}` > Agrega una cita
 
     > Por ejemplo: /users/appointment/1
 
+    {
+      "appointment_date": "string",
+      "appointment_place": "string",
+      "clinic_name": "string"
+    }
+
 - POST `/users/info-appointments/{user_id}` > Agrega información de una cita
 
     > Por ejemplo: /users/info-appointments/1
+
+    {
+      "blood_pressure": "string",
+      "temperature": "string",
+      "heart_rate": "string",
+      "weight": "string",
+      "next_appointment_date": "string",
+      "observation": "string"
+    }
 
 - POST `/users/drug/{user_id}` > Agregar un medicamento
 
     > Por ejemplo: /users/drug/1
 
+    {
+      "drug_name": "string"
+    }
+
 - POST `/users/allergy/{user_id}` >  Agregar una alergia
 
     > Por ejemplo: /users/allergy/1
 
+    {
+      "allergy_name": "string"
+    }
+
 - POST `/users/chronic-disease/{user_id}` > Agregar una enfermedad crónica
 
     > Por ejemplo: /users/chronic-disease/1
+
+    {
+      "disease_name": "string"
+    }
