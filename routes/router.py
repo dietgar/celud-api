@@ -7,13 +7,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from validations.user_data import *
 # from typing import List
 
-
 root = APIRouter()
-
 
 # * Ruta para agregar un usuario a la BD
 
-@root.post("/api/users/register")
+@root.post("/users/register")
 def register(data_user: Register):
     with engine.connect() as conn:
         try:
@@ -35,7 +33,6 @@ def register(data_user: Register):
                     data_user.password, "pbkdf2:sha256:30", 30)
                 result = conn.execute(user.insert().values(new_user))
                 return conn.execute(user.select().where(user.c.id_user == result.lastrowid)).first()
-
         except:
             return {
                 "status": HTTP_500_INTERNAL_SERVER_ERROR,
@@ -45,7 +42,7 @@ def register(data_user: Register):
 # * Ruta para hacer login
 
 
-@root.post("/api/users/login")
+@root.post("/users/login")
 def login(user_login: Login):
     with engine.connect() as conn:
         try:
@@ -55,7 +52,7 @@ def login(user_login: Login):
 
                 if result != None:
                     check_password = check_password_hash(
-                        result[7], user_login.password)
+                        result[5], user_login.password)
 
                     if check_password:
                         return {
@@ -80,10 +77,9 @@ def login(user_login: Login):
                 "message": "Ha ocurrido un error inesperado"
             }
 
-# * Ruta para agregar datos aparte de los de Crear Usuario
+# * Ruta para agregar datos personales
 
-
-@root.post("/api/users/personal-data/{user_id}")
+@root.post("/users/personal-data/{user_id}")
 def additional_user_info(user_id: int, data_user: UserData):
     with engine.connect() as conn:
         try:
@@ -119,10 +115,9 @@ def additional_user_info(user_id: int, data_user: UserData):
                 "message": "Ha ocurrido un error inesperado"
             }
 
-
 # * Ruta para crear un contacto de emergencia
 
-@root.post("/api/users/user_contact/{user_id}")
+@root.post("/users/user-contact/{user_id}")
 def create_user_contact(user_id: int, data: UserContact):
     with engine.connect() as conn:
         try:
@@ -162,12 +157,10 @@ def create_user_contact(user_id: int, data: UserContact):
 
 # * Ruta para agregar un recordatorio
 
-
-@root.post("/api/users/reminder")
+@root.post("/users/reminder/{user_id}")
 def create_reminder(user_id: int, data: Reminder):
     with engine.connect() as conn:
         try:
-
             exist_id = conn.execute(
                 user.select().where(user.c.id_user == user_id)).first()
 
@@ -175,7 +168,7 @@ def create_reminder(user_id: int, data: Reminder):
 
                 if not validate_date(data.date_):
                     return {
-                        "detail": "Ingrese una fecha válida"
+                        "detail": "Formato de fecha DD-MM-YYYY"
                     }
                 try:
                     validate_time(data.time_)
@@ -185,7 +178,12 @@ def create_reminder(user_id: int, data: Reminder):
                     }
                 new_reminder = dict(data)
                 new_reminder["id_user"] = exist_id[0]
-                new_reminder["date_"] = format_date(data.date_)
+                try:                
+                    new_reminder["date_"] = format_date(data.date_)
+                except:
+                    return {
+                        "detail": "Fecha fuera de rango"
+                    }
                 new_reminder["status_"] = True
                 result = conn.execute(reminder.insert().values(new_reminder))
                 return conn.execute(reminder.select().where(reminder.c.id_reminder == result.lastrowid)).first()
@@ -199,10 +197,9 @@ def create_reminder(user_id: int, data: Reminder):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para agregar la dirección de un usuario
 
-@root.post("/api/users/address/{user_id}")
+@root.post("/users/address/{user_id}")
 def add_address(user_id: int, data: Address):
     with engine.connect() as conn:
         try:
@@ -227,10 +224,9 @@ def add_address(user_id: int, data: Address):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para agregar una cita
 
-@root.post("/api/users/appointment/{user_id}")
+@root.post("/users/appointment/{user_id}")
 def create_appointment(user_id: int, data: Appointment):
     with engine.connect() as conn:
         try:
@@ -268,10 +264,9 @@ def create_appointment(user_id: int, data: Appointment):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para agregar información de una cita
 
-@root.post("/api/users/info-appointments/{user_id}")
+@root.post("/users/info-appointments/{user_id}")
 def create_info_appointment(appointment_id: int, data: InfoAppointment):
     with engine.connect() as conn:
         try:
@@ -310,10 +305,9 @@ def create_info_appointment(appointment_id: int, data: InfoAppointment):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para agregar un medicamento
 
-@root.post("/api/users/drug/{user_id}")
+@root.post("/users/drug/{user_id}")
 def add_drug(user_id: int, data: Drug):
     with engine.connect() as conn:
         try:
@@ -342,8 +336,7 @@ def add_drug(user_id: int, data: Drug):
 
 # * Ruta para agregar una alergia
 
-
-@root.post("/api/users/allergy/{user_id}")
+@root.post("/users/allergy/{user_id}")
 def add_allergy(user_id: int, data: Allergy):
     with engine.connect() as conn:
         try:
@@ -369,10 +362,9 @@ def add_allergy(user_id: int, data: Allergy):
                 "detail": "Ha ocurrido un error"
             }
 
-
 # * Ruta para agregar una enfermedad crónica
 
-@root.post("/api/users/chronic-disease/{user_id}")
+@root.post("/users/chronic-disease/{user_id}")
 def add_chronic_disease(user_id: int, data: ChronicDiseases):
     with engine.connect() as conn:
         try:
@@ -399,8 +391,7 @@ def add_chronic_disease(user_id: int, data: ChronicDiseases):
                 "message": "Ha ocurrido un error"
             }
 
-
-# * Ruta para listar a todos los usuarios
+# * Ruta para ver a todos los usuarios
 
 @root.get("/users")
 def get_users():
@@ -413,10 +404,9 @@ def get_users():
                 "detail": "Ha ocurrido un error"
             }
 
+# * Ruta para ver un solo usuario
 
-# * Ruta para mostrar un solo usuario
-
-@root.get("/users/{user_id}")
+@root.get("/user/{user_id}")
 def get_user(user_id: int):
     with engine.connect() as conn:
         try:
@@ -434,10 +424,9 @@ def get_user(user_id: int):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para ver la data de todos los usuarios
 
-@root.get("/personal-data")
+@root.get("/all-personal-data")
 def get_all_user_data():
     with engine.connect() as conn:
         try:
@@ -450,7 +439,6 @@ def get_all_user_data():
             }
 
 # * Ruta para ver la data de un usuario
-
 
 @root.get("/personal-data/{user_id}")
 def get_user_data(user_id: int):
@@ -472,7 +460,6 @@ def get_user_data(user_id: int):
 
 # * Ruta para ver todos los contactos de emergencia
 
-
 @root.get("/user_contact/")
 def get_all_user_contact():
     with engine.connect() as conn:
@@ -486,7 +473,6 @@ def get_all_user_contact():
             }
 
 # * Ruta para los contactos de un usuario
-
 
 @root.get("/user_contact/{user_id}")
 def get_user_contact(user_id: int):
@@ -508,7 +494,6 @@ def get_user_contact(user_id: int):
 
 # * Ruta para ver todos los recordatorios
 
-
 @root.get("/reminder/")
 def get_reminder():
     with engine.connect() as conn:
@@ -522,7 +507,6 @@ def get_reminder():
             }
 
 # * Ruta para ver los recordatorios de un usuario
-
 
 @root.get("/reminder/{user_id}")
 def get_reminder(user_id: int):
@@ -545,7 +529,6 @@ def get_reminder(user_id: int):
 
 # * Ruta para ver todas las direcciones
 
-
 @root.get("/address/")
 def get_user_address():
     with engine.connect() as conn:
@@ -559,7 +542,6 @@ def get_user_address():
             }
 
 # * Ruta para ver la direccion de un usuario
-
 
 @root.get("/address/{user_id}")
 def get_user_address(user_id: int):
@@ -597,7 +579,6 @@ def get_appointment():
 
 # * Ruta para ver las citas de un usuario
 
-
 @root.get("/appointment/{user_id}")
 def get_appointment(user_id: int):
     with engine.connect() as conn:
@@ -618,7 +599,6 @@ def get_appointment(user_id: int):
 
 # * Ruta para ver la info de todas las citas
 
-
 @root.get("/info-appointments/")
 def get_all_info_appointment():
     with engine.connect() as conn:
@@ -633,7 +613,6 @@ def get_all_info_appointment():
 
 
 # * Ruta para ver la info de las citas de un usuario
-
 
 @root.get("/info-appointments/{appointment_id}")
 def get_info_appointment(appointment_id: int):
@@ -655,7 +634,6 @@ def get_info_appointment(appointment_id: int):
 
 # * Ruta para ver todos los medicamentos
 
-
 @root.get("/drug/")
 def get_user_drug():
     with engine.connect() as conn:
@@ -669,7 +647,6 @@ def get_user_drug():
             }
 
 # * Ruta para ver los medicamentos de un usuario
-
 
 @root.get("/drug/{user_id}")
 def get_user_drug(user_id: int):
@@ -691,7 +668,6 @@ def get_user_drug(user_id: int):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para ver todas las alergias
 
 @root.get("/allergy/")
@@ -705,7 +681,6 @@ def get_allergy():
                 "status": HTTP_500_INTERNAL_SERVER_ERROR,
                 "message": "Ha ocurrido un error"
             }
-
 
 # * Ruta para ver las alergias de un usuario
 
@@ -729,7 +704,6 @@ def get_allergy(user_id: int):
                 "message": "Ha ocurrido un error"
             }
 
-
 # * Ruta para ver todas las enfermedades
 
 @root.get("/chronic-disease/")
@@ -743,7 +717,6 @@ def get_chronic_disease():
                 "status": HTTP_500_INTERNAL_SERVER_ERROR,
                 "message": "Ha ocurrido un error"
             }
-
 
 # * Ruta para ver las enfermedades crónicas de un usuario
 

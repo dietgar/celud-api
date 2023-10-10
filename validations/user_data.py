@@ -14,7 +14,7 @@ def format_string(name):
 
 
 def format_date(date):
-    birth_date = datetime.strptime(date, "%d-%m-%Y").date()
+    birth_date = datetime.strptime(date, "%d/%m/%Y").date()
     return birth_date
 
 
@@ -24,7 +24,7 @@ def validate_time(time_):
 
 
 def validate_date(date):
-    pattern = r'^\d{1,2}-\d{1,2}-\d{4}$'
+    pattern = r'^\d{1,2}/\d{1,2}/\d{4}$'
     result = re.search(pattern, date)
     if result:
         return True
@@ -124,8 +124,6 @@ def validate_data_user(data_user: Register):
             counter += 1
         if validate_string(data_user.last_name):
             counter += 1
-        # if validate_phone_number(data_user.phone_number):
-        #     counter += 1
         if validate_username(data_user.username):
             counter += 1
         if validate_email(data_user.email):
