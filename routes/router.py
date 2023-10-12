@@ -5,6 +5,7 @@ from schemas.user_schema import *
 from starlette.status import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from validations.user_data import *
+from fastapi import Body
 # from typing import List
 
 root = APIRouter()
@@ -13,36 +14,36 @@ root = APIRouter()
 
 
 @root.post("/users/register")
-def register(data_user: Register):
+def register(data_user: Register = Body(..., embed=True)):
     with engine.connect() as conn:
-        try:
-            if exist_username(data_user.username):
-                return {
-                    "detail": "Este nombre de usuario ya está en uso"
-                }
-
-            if exist_email(data_user.email):
-                return {
-                    "detail": "Este correo electrónico ya pertenece a otra cuenta"
-                }
-
-            if validate_data_user(data_user):
-                new_user = dict(data_user)
-                new_user["first_name"] = format_string(data_user.first_name)
-                new_user["last_name"] = format_string(data_user.last_name)
-                new_user["password"] = generate_password_hash(
-                    data_user.password, "pbkdf2:sha256:30", 30)
-                result = conn.execute(user.insert().values(new_user))
-                print(result)
-                return conn.execute(user.select().where(user.c.id_user == result.lastrowid)).first()
+        # try:
+        if exist_username(data_user.username):
             return {
-                "detail": "Los datos introducidos son incorrectos"
+                "detail": "Este nombre de usuario ya está en uso"
             }
-        except:
+
+        if exist_email(data_user.email):
             return {
-                "status": HTTP_500_INTERNAL_SERVER_ERROR,
-                "message": "Ha ocurrido un error inesperado"
+                "detail": "Este correo electrónico ya pertenece a otra cuenta"
             }
+
+        if validate_data_user(data_user):
+            new_user = dict(data_user)
+            new_user["first_name"] = format_string(data_user.first_name)
+            new_user["last_name"] = format_string(data_user.last_name)
+            new_user["password"] = generate_password_hash(
+                data_user.password, "pbkdf2:sha256:30", 30)
+            result = conn.execute(user.insert().values(new_user))
+            print(result)
+            return conn.execute(user.select().where(user.c.id_user == result.lastrowid)).first()
+        return {
+            "detail": "Los datos introducidos son incorrectos"
+        }
+        # except:
+        #     return {
+        #         "status": HTTP_500_INTERNAL_SERVER_ERROR,
+        #         "message": "Ha ocurrido un error inesperado"
+        #     }
 
 # * Ruta para hacer login
 
