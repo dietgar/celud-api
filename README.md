@@ -4,7 +4,7 @@
 
 ## Se debe tener Python 3 y MySQL instalado
 
-### Se recomienda usar la terminal Git Bash en el caso de usar Windows\*
+### Se recomienda usar la terminal Git Bash en el caso de usar Windows
 
 - Abrir una terminal
 
@@ -62,7 +62,7 @@
 
 ### Crear un usuario
 
-- POST `/users/register` > Agregar un usuario
+- POST `/users/register`
 
 ```json
 {
@@ -78,7 +78,7 @@
 
 ### Iniciar sesión
 
-- POST `/users/login` > Iniciar sesión
+- POST `/users/login`
 
 ```json
 {
@@ -89,7 +89,9 @@
 }
 ```
 
-- POST `/user/medicaments/{user_id}` > Agregar medicamento mediante el ID del usuario
+### Agregar medicamento
+
+- POST `/user/medicaments/{user_id}` > Necesita el ID del usuario
 
   > Por ejemplo: /user/medicaments/1
 
@@ -107,7 +109,9 @@
 }
 ```
 
-- POST `/user/reminder-medicament/{user_id}/{medicament_id}` > Agregar recordatorio de medicamento mediante ID de usuario y ID de medicamento
+### Agregar recordatorio de un medicamento
+
+- POST `/user/reminder-medicament/{user_id}/{medicament_id}` > Necesita el ID del usuario y el ID del medicamento
 
   > Por ejemplo: /user/reminder-medicament/1/1
 
@@ -121,7 +125,9 @@
 }
 ```
 
-- POST `/users/measurements/{user_id}` > Agregar la medición mediante el ID del usuario
+### Agregar mediciones diarias
+
+- POST `/users/measurements/{user_id}` > Necesita el ID del usuario
 
   > Por ejemplo: /users/measurements/1
 
@@ -135,7 +141,9 @@
 }
 ```
 
-- POST `/users/appointment/{user_id}` > Agregar una cita mediante el ID del usuario
+### Agregar una cita
+
+- POST `/users/appointment/{user_id}` > Necesita el ID del usuario
 
   > Por ejemplo: /users/appointment/1
 
@@ -150,7 +158,9 @@
 }
 ```
 
-- POST `/users/reminder-appointment/{user_id}/{appointment_id}` > Agregar un recordatorio de cita mediante el ID del usuario y el ID de la cita
+### Agregar un recordatorio para una cita
+
+- POST `/users/reminder-appointment/{user_id}/{appointment_id}` > Necesita el ID del usuario y el ID de la cita
 
   > Por ejemplo: /users/reminder-appointment/1/1
 
@@ -163,3 +173,59 @@
   }
 }
 ```
+
+### Ver todos los usuarios
+
+- GET `/users`
+
+### Ver un solo usuario
+
+- GET `/user/{user_id}` > Necesita el ID del usuario
+
+  > Por ejemplo: /user/1
+
+### Ver todos los medicamentos
+
+- GET `/all-medicaments`
+
+### Ver todos los medicamentos de un usuario
+
+- GET `/medicaments/{user_id}` > Necesita el ID del usuario
+
+  > Por ejemplo: /medicaments/1
+
+### Ver un solo medicamento
+
+- GET `/medicament/{medicament_id}` > Necesita el ID del medicamento
+
+  > Por ejemplo: /medicament/1
+
+### Ver todas las mediciones
+
+- GET `/all-measuremens`
+
+### Ver las mediciones de un usuario
+
+- GET `/measurements/{user_id}` > Necesita el ID del usuario
+
+  > Por ejemplo: /measurements/1
+
+### Ver una medición
+
+- GET `/measurement/{measuremend_id}` > Necesita el ID de la medición
+
+### Ver todas las citas
+
+- GET `/appointments`
+
+### Ver las citas de un usuario
+
+- GET `/appointments/{user_id}` > Necesita el ID del usuario
+
+  > Por ejemplo: /appointments/1
+
+### Ver el recordatorio de una cita
+
+- GET `/reminder-appointment/{appointment_id}` > Necesita el ID de la cita
+
+  > Por ejemplo: /reminder-appointment/1
