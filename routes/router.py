@@ -68,17 +68,17 @@ async def register(data: Register = Body(..., embed=True)):
 
 
 @root.post("/users/login")
-async def login(user_login: Login = Body(..., embed=True)):
+async def login(data: Login = Body(..., embed=True)):
     with engine.connect() as conn:
         # try:
-        if validate_email(user_login.email):
+        if validate_email(data.email):
             result = conn.execute(user.select().where(
-                user.c.email == user_login.email)).first()
+                user.c.email == data.email)).first()
 
             if result != None:
                 # print(dict(result))
                 check_password = check_password_hash(
-                    result[5], user_login.password)
+                    result[5], data.password)
 
                 if check_password:
                     return {
@@ -112,11 +112,13 @@ async def add_medicament(user_id: int, data: Medicaments = Body(..., embed=True)
         if result != None:
             if not len(data.name) > 0 and len(data.name) < 50:
                 return {
-                    "detail": "El nombre no puede superar los 50 caracteres"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "El nombre no puede superar los 50 caracteres"
                 }
             if not len(data.description) >= 0 and len(data.description) < 150:
                 return {
-                    "detail": "La descripcion no puede superar los 150 caracteres"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "La descripcion no puede superar los 150 caracteres"
                 }
             new_medicament = dict(data)
             new_medicament["id_user"] = result[0]
@@ -127,7 +129,8 @@ async def add_medicament(user_id: int, data: Medicaments = Body(..., embed=True)
             data_medicament["id_user"] = result[0]
             return HTTP_201_CREATED, conn.execute(medicaments.select().where(medicaments.c.id_medicament == last_row_id.lastrowid)).first()
         return {
-            "detail": "Este usuario no existe"
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
         }
 
 
@@ -140,28 +143,34 @@ async def create_reminder_medicament(user_id: int, medicament_id: int, data: Rem
             medicaments.c.id_medicament == medicament_id)).first()
         if not result != None:
             return {
-                "detail": "Este usuario no existe"
+                "status": HTTP_404_NOT_FOUND,
+                "message": "Este usuario no existe"
             }
         if not medicament_id != None:
             return {
-                "detail": "Este medicamento no existe"
+                "status": HTTP_404_NOT_FOUND,
+                "message": "Este medicamento no existe"
             }
         if not len(data.text) > 0 and len(data.text) < 150:
             return {
-                "detail": "El texto supera los 150 caracteres"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "El texto supera los 150 caracteres"
             }
         if not validate_date(data.date_):
             return {
-                "detail": "Formato de fecha incorrecto"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "Formato de fecha incorrecto"
             }
         try:
             if not validate_time(data.time_):
                 return {
-                    "detail": "Formato de hora incorrecto"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Formato de hora incorrecto"
                 }
         except:
             return {
-                "detail": "Ingrese una hora correcta"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "Ingrese una hora correcta"
             }
         new_reminder = dict(data)
         new_reminder["id_medicament"] = medicament_id[0]
@@ -170,7 +179,8 @@ async def create_reminder_medicament(user_id: int, medicament_id: int, data: Rem
             new_reminder["date_"] = format_date(data.date_)
         except:
             return {
-                "detail": "Fecha fuera de rango"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "Fecha fuera de rango"
             }
         last_row_id = conn.execute(
             reminder_medicament.insert().values(new_reminder))
@@ -185,11 +195,13 @@ async def add_measurement(user_id: int, data: Measurements = Body(..., embed=Tru
         if result != None:
             if not len(data.glycemia) > 0 and len(data.glycemia) < 10:
                 return {
-                    "detail": "Se ha pasado el límite de caracteres"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Se ha pasado el límite de caracteres"
                 }
             if not validate_blood_pressure(data.blood_presure):
                 return {
-                    "detail": "Presión sanguínea en el formato incorrecto"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Presión sanguínea en el formato incorrecto"
                 }
             new_measurement = dict(data)
             new_measurement["id_user"] = result[0]
@@ -198,7 +210,8 @@ async def add_measurement(user_id: int, data: Measurements = Body(..., embed=Tru
                 measurements.insert().values(new_measurement))
             return conn.execute(measurements.select().where(measurements.c.id_measurements == last_row_id.lastrowid)).first()
         return {
-            "detail": "Este usuario no existe"
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
         }
 
 
@@ -210,24 +223,29 @@ async def create_appointment(user_id: int, data: Appointment = Body(..., embed=T
         if result != None:
             if not validate_date(data.date_):
                 return {
-                    "detail": "Ingrese una fecha correcta"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Ingrese una fecha correcta"
                 }
             if not validate_time(data.time_):
                 return {
-                    "detail": "Ingrese una hora correcta"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Ingrese una hora correcta"
                 }
             try:
                 if not len(data.place) > 0 and len(data.place) < 50:
                     return {
-                        "detail": "El texto no puede superar los 50 carácteres"
+                        "status": HTTP_400_BAD_REQUEST,
+                        "message": "El texto no puede superar los 50 carácteres"
                     }
             except:
                 return {
-                    "detail": "Debe introducir el lugar de la cita"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Debe introducir el lugar de la cita"
                 }
             if not validate_string(data.doctor):
                 return {
-                    "detail": "Nombres no pueden contener números o símbolos"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Nombres no pueden contener números o símbolos"
                 }
             new_appointment = dict(data)
             new_appointment["id_user"] = result[0]
@@ -235,13 +253,15 @@ async def create_appointment(user_id: int, data: Appointment = Body(..., embed=T
                 new_appointment["date_"] = format_date(data.date_)
             except:
                 return {
-                    "detail": "Fecha fuera de rango"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Fecha fuera de rango"
                 }
             last_row_id = conn.execute(
                 appointment.insert().values(new_appointment))
             return conn.execute(appointment.select().where(appointment.c.id_appointment == last_row_id.lastrowid)).first()
         return {
-            "detail": "Este usuario no existe"
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
         }
 
 
@@ -254,24 +274,29 @@ async def create_appointment_reminder(user_id: int, appointment_id: int, data: R
             appointment.c.id_appointment == appointment_id)).first()
         if not result != None:
             return {
-                "detail": "Este usuario no existe"
+                "status": HTTP_404_NOT_FOUND,
+                "message": "Este usuario no existe"
             }
         if not appointment_id != None:
             return {
-                "detail": "Esta cita no existe"
+                "status": HTTP_404_NOT_FOUND,
+                "message": "Esta cita no existe"
             }
         if not validate_date(data.date_):
             return {
-                "detail": "Formato de fecha incorrecto"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "Formato de fecha incorrecto"
             }
         try:
             if not validate_time(data.time_):
                 return {
-                    "detail": "Formato de hora incorrecto"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Formato de hora incorrecto"
                 }
         except:
             return {
-                "La hora introducida no es correcta"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "La hora introducida no es correcta"
             }
         new_reminder = dict(data)
         new_reminder["id_appointment"] = appointment_id[0]
@@ -280,7 +305,8 @@ async def create_appointment_reminder(user_id: int, appointment_id: int, data: R
             new_reminder["date_"] = format_date(data.date_)
         except:
             return {
-                "detail": "Fecha fuera de rango"
+                "status": HTTP_400_BAD_REQUEST,
+                "message": "Fecha fuera de rango"
             }
         last_row_id = conn.execute(
             reminder_appointment.insert().values(new_reminder))
@@ -312,8 +338,56 @@ async def get_user(user_id: int):
         if result != None:
             return result
         return {
-            "detail": "Este usuario no existe"
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
         }
+
+# * Ruta para obtener todos los medicamentos
+
+
+@root.get("/all-medicaments")
+async def get_all_medicaments():
+    with engine.connect() as conn:
+        return conn.execute(medicaments.select()).fetchall()
+
+
+# * Ruta para obtener todos los medicamentos de un usuario
+
+@root.get("/medicaments/{user_id}")
+async def get_medicaments(user_id: int):
+    with engine.connect() as conn:
+        result = conn.execute(medicaments.select().where(
+            medicaments.c.id_user == user_id)).fetchall()
+        if result != None:
+            return result
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
+        }
+
+
+# * Ruta para obtener un medicamento
+
+@root.get("/medicament/{medicament_id}")
+async def get_medicament(medicament_id: int):
+    with engine.connect() as conn:
+        result = conn.execute(medicaments.select().where(
+            medicaments.c.id_medicament == medicament_id)).first()
+        if result != None:
+            return result
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este medicamento no existe"
+        }
+
+
+# * Ruta para obtener todas las mediciones
+
+@root.get("/all-measuremens")
+async def get_all_measurements():
+    with engine.connect() as conn:
+        result = conn.execute(measurements.select()).fetchall()
+        return result
 
 # * Ruta para obtener todas las mediciones de un usuario
 
@@ -326,8 +400,64 @@ async def get_measurements(user_id: int):
         if result != None:
             return result
         return {
-            "detail": "Este usuario no existe"
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
         }
+
+# * Ruta para obtener una medición por ID
+
+
+@root.get("/measurement/{measuremend_id}")
+async def get_measurement(measurement_id: int):
+    with engine.connect() as conn:
+        result = conn.execute(measurements.select().where(
+            measurements.c.id_measuremens == measurement_id)).first()
+        if result != None:
+            return result
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Medición no encontrada"
+        }
+
+# * Ruta para obtener todas las citas
+
+
+@root.get("/appointments")
+async def get_all_appointments():
+    with engine.connect() as conn:
+        result = conn.execute(appointment.select()).fetchall()
+        return result
+
+
+# * Ruta para obtener las citas de un usuario
+
+@root.get("/appointments/{user_id}")
+async def get_appointments(user_id: int):
+    with engine.connect() as conn:
+        result = conn.execute(appointment.select().where(
+            appointment.c.id_user == user_id)).fetchall()
+        if result != None:
+            return result
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
+        }
+
+
+# * Ruta para obtener el recordatorio de una cita
+
+@root.get("/reminder-appointment/{appointment_id}")
+async def get_reminder_appointment(appointment_id: int):
+    with engine.connect() as conn:
+        result = conn.execute(reminder_appointment.select().where(
+            reminder_appointment.c.id_appointment == appointment_id)).first()
+        if result != None:
+            return result
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Recordatorio de cita no encontrado"
+        }
+
 
 # @root.post("/users/personal-data/{user_id}")
 # def additional_user_info(user_id: int, data_user: UserData):
