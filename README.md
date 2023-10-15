@@ -58,9 +58,9 @@
 
   > Esto levanta el servidor en localhost:8000
 
-## Tutorial
+## Endpoints
 
-## Crear un usuario
+### Crear un usuario
 
 - POST `/users/register` > Agregar un usuario
 
@@ -76,118 +76,90 @@
 }
 ```
 
+### Iniciar sesión
+
 - POST `/users/login` > Iniciar sesión
 
 ```json
 {
-  "user_login": {
+  "data": {
     "email": "string",
     "password": "string"
   }
 }
 ```
 
-- POST `/users/personal-data/{user_id}` > Agregar datos personales mediante id
+- POST `/user/medicaments/{user_id}` > Agregar medicamento mediante el ID del usuario
 
-  > Por ejemplo: /users/personal-data/1
-
-```json
-{
-  "height": 0,
-  "weight": 0,
-  "birth_date": "string",
-  "blood_type": "string",
-  "status_": true
-}
-```
-
-- POST `/users/user-contact/{user_id}` > Agregar contacto de emergencia mediante id
-
-  > Por ejemplo: /users/user-contact/1
+  > Por ejemplo: /user/medicaments/1
 
 ```json
 {
-  "name": "string",
-  "relationship": "string",
-  "phone_number": "string"
+  "data": {
+    "name": "string",
+    "description": "string"
+  },
+  "medicament_data": {
+    "cantity": "string",
+    "frecuency": "string",
+    "duration": "string"
+  }
 }
 ```
 
-- POST `/users/reminder/{user_id}` > Agregar un recordatorio
+- POST `/user/reminder-medicament/{user_id}/{medicament_id}` > Agregar recordatorio de medicamento mediante ID de usuario y ID de medicamento
 
-  > Por ejemplo: /users/reminder/1
+  > Por ejemplo: /user/reminder-medicament/1/1
 
 ```json
 {
-  "date_": "string",
-  "time_": "string",
-  "reminder_text": "string"
+  "data": {
+    "text": "string",
+    "date_": "DD/MM/YYYY",
+    "time_": "HH:MM"
+  }
 }
 ```
 
-- POST `/users/address/{user_id}` > Agregar una dirección
+- POST `/users/measurements/{user_id}` > Agregar la medición mediante el ID del usuario
 
-  > Por ejemplo: /users/address/1
+  > Por ejemplo: /users/measurements/1
 
 ```json
 {
-  "address": "string"
+  "data": {
+    "weight": 0,
+    "glycemia": "string",
+    "blood_presure": "120/80" // Formato de presión arterial
+  }
 }
 ```
 
-- POST `/users/appointment/{user_id}` > Agrega una cita
+- POST `/users/appointment/{user_id}` > Agregar una cita mediante el ID del usuario
 
   > Por ejemplo: /users/appointment/1
 
 ```json
 {
-  "appointment_date": "string",
-  "appointment_place": "string",
-  "clinic_name": "string"
+  "data": {
+    "date_": "DD/MM/YYYY",
+    "time_": "HH:MM",
+    "place": "string",
+    "doctor": "string"
+  }
 }
 ```
 
-- POST `/users/info-appointments/{user_id}` > Agrega información de una cita
+- POST `/users/reminder-appointment/{user_id}/{appointment_id}` > Agregar un recordatorio de cita mediante el ID del usuario y el ID de la cita
 
-  > Por ejemplo: /users/info-appointments/1
-
-```json
-{
-  "blood_pressure": "string",
-  "temperature": "string",
-  "heart_rate": "string",
-  "weight": "string",
-  "next_appointment_date": "string",
-  "observation": "string"
-}
-```
-
-- POST `/users/drug/{user_id}` > Agregar un medicamento
-
-  > Por ejemplo: /users/drug/1
+  > Por ejemplo: /users/reminder-appointment/1/1
 
 ```json
 {
-  "drug_name": "string"
-}
-```
-
-- POST `/users/allergy/{user_id}` > Agregar una alergia
-
-  > Por ejemplo: /users/allergy/1
-
-```json
-{
-  "allergy_name": "string"
-}
-```
-
-- POST `/users/chronic-disease/{user_id}` > Agregar una enfermedad crónica
-
-  > Por ejemplo: /users/chronic-disease/1
-
-```json
-{
-  "disease_name": "string"
+  "data": {
+    "text": "string",
+    "date_": "DD/MM/YYYY",
+    "time_": "HH:MM"
+  }
 }
 ```

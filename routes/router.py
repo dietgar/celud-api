@@ -127,7 +127,7 @@ async def add_medicament(user_id: int, data: Medicaments = Body(..., embed=True)
             data_medicament = dict(medicament_data)
             data_medicament["id_medicament"] = last_row_id.lastrowid
             data_medicament["id_user"] = result[0]
-            return HTTP_201_CREATED, conn.execute(medicaments.select().where(medicaments.c.id_medicament == last_row_id.lastrowid)).first()
+            return conn.execute(medicaments.select().where(medicaments.c.id_medicament == last_row_id.lastrowid)).first()
         return {
             "status": HTTP_404_NOT_FOUND,
             "message": "Este usuario no existe"
