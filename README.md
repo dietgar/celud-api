@@ -4,7 +4,7 @@
 
 ## Se debe tener Python 3 y MySQL instalado
 
-### Se recomienda usar la terminal Git Bash en el caso de usar Windows*
+### Se recomienda usar la terminal Git Bash en el caso de usar Windows\*
 
 - Abrir una terminal
 
@@ -43,7 +43,7 @@
   `source venv/bin/activate`
 
   **Git Bash en Windows**
-  
+
   `source nombre_del_entorno_virtual/Scripts/activate`
 
   `source venv/Scripts/activate`
@@ -63,106 +63,131 @@
 ## Crear un usuario
 
 - POST `/users/register` > Agregar un usuario
+
 ```json
-    {
-      "first_name": "string",
-      "last_name": "string",
-      "username": "string",
-      "email": "string",
-      "password": "string"
-    }
+{
+  "data": {
+    "first_name": "string",
+    "last_name": "string",
+    "username": "string",
+    "email": "string",
+    "password": "string"
+  }
+}
 ```
+
 - POST `/users/login` > Iniciar sesión
+
 ```json
-    {
-      "email": "string",
-      "password": "string"
-    }
+{
+  "user_login": {
+    "email": "string",
+    "password": "string"
+  }
+}
 ```
+
 - POST `/users/personal-data/{user_id}` > Agregar datos personales mediante id
 
-    > Por ejemplo: /users/personal-data/1
+  > Por ejemplo: /users/personal-data/1
+
 ```json
-    {
-      "height": 0,
-      "weight": 0,
-      "birth_date": "string",
-      "blood_type": "string",
-      "status_": true
-    }
+{
+  "height": 0,
+  "weight": 0,
+  "birth_date": "string",
+  "blood_type": "string",
+  "status_": true
+}
 ```
+
 - POST `/users/user-contact/{user_id}` > Agregar contacto de emergencia mediante id
 
-    > Por ejemplo: /users/user-contact/1
+  > Por ejemplo: /users/user-contact/1
+
 ```json
-    {
-      "name": "string",
-      "relationship": "string",
-      "phone_number": "string"
-    }
+{
+  "name": "string",
+  "relationship": "string",
+  "phone_number": "string"
+}
 ```
+
 - POST `/users/reminder/{user_id}` > Agregar un recordatorio
 
-    > Por ejemplo: /users/reminder/1
+  > Por ejemplo: /users/reminder/1
+
 ```json
-    {
-      "date_": "string",
-      "time_": "string",
-      "reminder_text": "string",
-    }
+{
+  "date_": "string",
+  "time_": "string",
+  "reminder_text": "string"
+}
 ```
+
 - POST `/users/address/{user_id}` > Agregar una dirección
 
-    > Por ejemplo: /users/address/1
+  > Por ejemplo: /users/address/1
+
 ```json
-    {
-      "address": "string"
-    }
+{
+  "address": "string"
+}
 ```
+
 - POST `/users/appointment/{user_id}` > Agrega una cita
 
-    > Por ejemplo: /users/appointment/1
+  > Por ejemplo: /users/appointment/1
+
 ```json
-    {
-      "appointment_date": "string",
-      "appointment_place": "string",
-      "clinic_name": "string"
-    }
+{
+  "appointment_date": "string",
+  "appointment_place": "string",
+  "clinic_name": "string"
+}
 ```
+
 - POST `/users/info-appointments/{user_id}` > Agrega información de una cita
 
-    > Por ejemplo: /users/info-appointments/1
+  > Por ejemplo: /users/info-appointments/1
+
 ```json
-    {
-      "blood_pressure": "string",
-      "temperature": "string",
-      "heart_rate": "string",
-      "weight": "string",
-      "next_appointment_date": "string",
-      "observation": "string"
-    }
+{
+  "blood_pressure": "string",
+  "temperature": "string",
+  "heart_rate": "string",
+  "weight": "string",
+  "next_appointment_date": "string",
+  "observation": "string"
+}
 ```
+
 - POST `/users/drug/{user_id}` > Agregar un medicamento
 
-    > Por ejemplo: /users/drug/1
-```json
-    {
-      "drug_name": "string"
-    }
-```
-- POST `/users/allergy/{user_id}` >  Agregar una alergia
+  > Por ejemplo: /users/drug/1
 
-    > Por ejemplo: /users/allergy/1
 ```json
-    {
-      "allergy_name": "string"
-    }
+{
+  "drug_name": "string"
+}
 ```
+
+- POST `/users/allergy/{user_id}` > Agregar una alergia
+
+  > Por ejemplo: /users/allergy/1
+
+```json
+{
+  "allergy_name": "string"
+}
+```
+
 - POST `/users/chronic-disease/{user_id}` > Agregar una enfermedad crónica
 
-    > Por ejemplo: /users/chronic-disease/1
+  > Por ejemplo: /users/chronic-disease/1
+
 ```json
-    {
-      "disease_name": "string"
-    }
+{
+  "disease_name": "string"
+}
 ```

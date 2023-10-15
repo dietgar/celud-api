@@ -11,123 +11,180 @@ user = Table("user", meta,
              Column("password", String(255), nullable=False)
              )
 
-user_data = Table("user_data", meta,
-                  Column("id_user_data", Integer,
-                         primary_key=True, autoincrement=True),
-                  Column("id_user", Integer, ForeignKey("user.id_user")),
-                  Column("height", Float, nullable=False),
-                  Column("weight", Float, nullable=False),
-                  Column("birth_date", Date, nullable=False),
-                  Column("blood_type", String(5), nullable=False),
-                  Column("status_", Boolean, nullable=False)
-                  )
-
-user_contact = Table("user_contact", meta,
-                     Column("id_user_contact", Integer,
+measurements = Table("measurements", meta,
+                     Column("id_measurements", Integer,
                             primary_key=True, autoincrement=True),
                      Column("id_user", Integer, ForeignKey("user.id_user")),
-                     Column("name", String(50), nullable=False),
-                     Column("relationship", String(50), nullable=False),
-                     Column("phone_number", String(15), nullable=False)
-                     )
-
-
-reminder = Table("reminder", meta,
-                 Column("id_reminder", Integer,
-                        primary_key=True, autoincrement=True),
-                 Column("id_user", Integer, ForeignKey('user.id_user')),
-                 Column("date_", Date, nullable=False),
-                 Column("time_", String(5), nullable=False),
-                 Column("reminder_text", String(100), nullable=False),
-                 Column("status_", Boolean, nullable=False)
-                 )
-
-
-drug = Table("drug", meta,
-             Column("id_drug", Integer, primary_key=True, autoincrement=True),
-             Column("id_user", Integer, ForeignKey("user.id_user")),
-             Column("drug_name", String(50), nullable=False),
-             )
-
-
-allergy = Table("allergy", meta,
-                Column("id_allergy", Integer,
-                       primary_key=True, autoincrement=True),
-                Column("id_user", Integer, ForeignKey("user.id_user")),
-                Column("allergy_name", String(50), nullable=False),
-                )
-
-
-chronic_diseases = Table("chronic_diseases", meta,
-                         Column("id_chronic_disease", Integer,
-                                primary_key=True, autoincrement=True),
-                         Column("id_user", Integer,
-                                ForeignKey("user.id_user")),
-                         Column("disease_name", String(50), nullable=False),
-                         )
-
-
-user_drug = Table("user_drug", meta,
-                  Column("id_user_drug", Integer,
-                         primary_key=True, autoincrement=True),
-                  Column("id_user", Integer, ForeignKey("user.id_user")),
-                  Column("id_drug", Integer, ForeignKey("drug.id_drug")),
-                  Column("status_", Boolean, nullable=False)
-                  )
-
-
-user_allergy = Table("user_allergy", meta,
-                     Column("id_user_allergy", Integer,
-                            primary_key=True, autoincrement=True),
-                     Column("id_user", Integer, ForeignKey("user.id_user")),
-                     Column("id_allergy", Integer,
-                            ForeignKey("allergy.id_allergy")),
-                     Column("status_", Boolean, nullable=False)
-                     )
-
-
-user_chronic_diseases = Table("user_chronic_diseases", meta,
-                              Column("id_user_chronic_disease", Integer,
-                                     primary_key=True, autoincrement=True),
-                              Column("id_user", Integer,
-                                     ForeignKey('user.id_user')),
-                              Column("id_chronic_disease", Integer, ForeignKey(
-                                  "chronic_diseases.id_chronic_disease")),
-                              Column("status_", Boolean, nullable=False)
-                              )
-
-
-user_address = Table("user_address", meta,
-                     Column("id_user_address", Integer,
-                            primary_key=True, autoincrement=True),
-                     Column("id_user", Integer, ForeignKey("user.id_user")),
-                     Column("address", String(100), nullable=False),
-                     )
-
+                     Column("weight", Float, nullable=False),
+                     Column("glycemia", String(10), nullable=False),
+                     Column("blood_presure", String(10), nullable=False),
+                     Column("date_", Date, nullable=False))
 
 appointment = Table("appointment", meta,
                     Column("id_appointment", Integer,
                            primary_key=True, autoincrement=True),
                     Column("id_user", Integer, ForeignKey("user.id_user")),
-                    Column("appointment_date", Date, nullable=False),
-                    Column("appointment_place", String(50), nullable=False),
-                    Column("clinic_name", String(50)),
-                    Column("status_", Boolean, nullable=False)
-                    )
+                    Column("date_", Date, nullable=False),
+                    Column("time_", String(10), nullable=False),
+                    Column("place", String(50), nullable=False),
+                    Column("doctor", String(50), nullable=False))
+
+reminder_appointment = Table("reminder_appointment", meta,
+                             Column("id_reminder", Integer,
+                                    primary_key=True, autoincrement=True),
+                             Column("id_appointment", Integer, ForeignKey(
+                                 "appointment.id_appointment")),
+                             Column("id_user", Integer,
+                                    ForeignKey("user.id_user")),
+                             Column("text", String(150)),
+                             Column("date_", Date, nullable=False),
+                             Column("time_", String(10), nullable=False))
+
+medicaments = Table("medicaments", meta,
+                    Column("id_medicament", Integer,
+                           primary_key=True, autoincrement=True),
+                    Column("id_user", Integer, ForeignKey("user.id_user")),
+                    Column("name", String(50), nullable=False),
+                    Column("description", String(150)))
+
+user_medicament = Table("user_medicament", meta,
+                        Column("id_user_medicament", Integer,
+                               primary_key=True, autoincrement=True),
+                        Column("id_medicament", Integer, ForeignKey(
+                            "medicaments.id_medicament")),
+                        Column("id_user", Integer, ForeignKey("user.id_user")),
+                        Column("cantity", String(45), nullable=False),
+                        Column("frecuency", String(45), nullable=False),
+                        Column("duration", String(45), nullable=False))
+
+reminder_medicament = Table("reminder_medicament", meta,
+                            Column("id_reminder_medicament", Integer,
+                                   primary_key=True, autoincrement=True),
+                            Column("id_medicament", Integer, ForeignKey(
+                                "medicaments.id_medicament")),
+                            Column("id_user", Integer,
+                                   ForeignKey("user.id_user")),
+                            Column("text", String(150), nullable=False),
+                            Column("date_", Date, nullable=False),
+                            Column("time_", String(15), nullable=False))
+
+# user_data = Table("user_data", meta,
+#                   Column("id_user_data", Integer,
+#                          primary_key=True, autoincrement=True),
+#                   Column("id_user", Integer, ForeignKey("user.id_user")),
+#                   Column("height", Float, nullable=False),
+#                   Column("weight", Float, nullable=False),
+#                   Column("birth_date", Date, nullable=False),
+#                   Column("blood_type", String(5), nullable=False),
+#                   Column("status_", Boolean, nullable=False)
+#                   )
+
+# user_contact = Table("user_contact", meta,
+#                      Column("id_user_contact", Integer,
+#                             primary_key=True, autoincrement=True),
+#                      Column("id_user", Integer, ForeignKey("user.id_user")),
+#                      Column("name", String(50), nullable=False),
+#                      Column("relationship", String(50), nullable=False),
+#                      Column("phone_number", String(15), nullable=False)
+#                      )
 
 
-info_appointment = Table("info_appointment", meta,
-                         Column("id_info_appointment", Integer,
-                                primary_key=True, autoincrement=True),
-                         Column("id_appointment", Integer, ForeignKey(
-                             "appointment.id_appointment")),
-                         Column("blood_pressure", String(20)),
-                         Column("temperature", String(20)),
-                         Column("heart_rate", String(20)),
-                         Column("weight", String(20)),
-                         Column("next_appointment_date", Date, nullable=False),
-                         Column("observation", String(100))
-                         )
+# reminder = Table("reminder", meta,
+#                  Column("id_reminder", Integer,
+#                         primary_key=True, autoincrement=True),
+#                  Column("id_user", Integer, ForeignKey('user.id_user')),
+#                  Column("date_", Date, nullable=False),
+#                  Column("time_", String(5), nullable=False),
+#                  Column("reminder_text", String(100), nullable=False),
+#                  Column("status_", Boolean, nullable=False)
+#                  )
+
+
+# drug = Table("drug", meta,
+#              Column("id_drug", Integer, primary_key=True, autoincrement=True),
+#              Column("id_user", Integer, ForeignKey("user.id_user")),
+#              Column("drug_name", String(50), nullable=False),
+#              )
+
+
+# allergy = Table("allergy", meta,
+#                 Column("id_allergy", Integer,
+#                        primary_key=True, autoincrement=True),
+#                 Column("id_user", Integer, ForeignKey("user.id_user")),
+#                 Column("allergy_name", String(50), nullable=False),
+#                 )
+
+
+# chronic_diseases = Table("chronic_diseases", meta,
+#                          Column("id_chronic_disease", Integer,
+#                                 primary_key=True, autoincrement=True),
+#                          Column("id_user", Integer,
+#                                 ForeignKey("user.id_user")),
+#                          Column("disease_name", String(50), nullable=False),
+#                          )
+
+
+# user_drug = Table("user_drug", meta,
+#                   Column("id_user_drug", Integer,
+#                          primary_key=True, autoincrement=True),
+#                   Column("id_user", Integer, ForeignKey("user.id_user")),
+#                   Column("id_drug", Integer, ForeignKey("drug.id_drug")),
+#                   Column("status_", Boolean, nullable=False)
+#                   )
+
+
+# user_allergy = Table("user_allergy", meta,
+#                      Column("id_user_allergy", Integer,
+#                             primary_key=True, autoincrement=True),
+#                      Column("id_user", Integer, ForeignKey("user.id_user")),
+#                      Column("id_allergy", Integer,
+#                             ForeignKey("allergy.id_allergy")),
+#                      Column("status_", Boolean, nullable=False)
+#                      )
+
+
+# user_chronic_diseases = Table("user_chronic_diseases", meta,
+#                               Column("id_user_chronic_disease", Integer,
+#                                      primary_key=True, autoincrement=True),
+#                               Column("id_user", Integer,
+#                                      ForeignKey('user.id_user')),
+#                               Column("id_chronic_disease", Integer, ForeignKey(
+#                                   "chronic_diseases.id_chronic_disease")),
+#                               Column("status_", Boolean, nullable=False)
+#                               )
+
+
+# user_address = Table("user_address", meta,
+#                      Column("id_user_address", Integer,
+#                             primary_key=True, autoincrement=True),
+#                      Column("id_user", Integer, ForeignKey("user.id_user")),
+#                      Column("address", String(100), nullable=False),
+#                      )
+
+
+# appointment = Table("appointment", meta,
+#                     Column("id_appointment", Integer,
+#                            primary_key=True, autoincrement=True),
+#                     Column("id_user", Integer, ForeignKey("user.id_user")),
+#                     Column("appointment_date", Date, nullable=False),
+#                     Column("appointment_place", String(50), nullable=False),
+#                     Column("clinic_name", String(50)),
+#                     Column("status_", Boolean, nullable=False)
+#                     )
+
+
+# info_appointment = Table("info_appointment", meta,
+#                          Column("id_info_appointment", Integer,
+#                                 primary_key=True, autoincrement=True),
+#                          Column("id_appointment", Integer, ForeignKey(
+#                              "appointment.id_appointment")),
+#                          Column("blood_pressure", String(20)),
+#                          Column("temperature", String(20)),
+#                          Column("heart_rate", String(20)),
+#                          Column("weight", String(20)),
+#                          Column("next_appointment_date", Date, nullable=False),
+#                          Column("observation", String(100))
+#                          )
 
 
 meta.create_all(engine)
