@@ -1276,3 +1276,29 @@ async def update_reminder_medicament(id_user: str, id_reminder_medicament: str, 
         return {
             "message": "Este usuario no posee un recordatorio o no existe"
         }
+
+
+# Get de los recordatorios de los medicamaentos
+@root.get("/all-reminder-medicament")
+async def get_reminders_meds():
+    with engine.connect() as conn:
+        return conn.execute(reminder_medicament.select()).fetchall()
+
+
+# Get recordatorio de los medicamentos de un usuario
+@root.get("/reminder-medicament/{id_user}")
+async def get_remindersMed_user(id_user: int):
+    with engine.connect() as conn:
+        result = conn.execute(reminder_medicament.select().where(
+            reminder_medicament.c.id_user == id_user)).fetchall()
+
+        try:
+            if (result != None):
+                return result
+            return {
+                "message": "El usuario no posee recordatorios"
+            }
+        except:
+            return {
+                "message": "El usuario no existe"
+            }
