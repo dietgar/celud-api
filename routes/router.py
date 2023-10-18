@@ -1205,30 +1205,36 @@ def update_appointment(id_appointment: int, data: UpdateAppointment):
         if (result != None):
             if not (validate_date(data.date_)):
                 return {
-                    "message": "La fecha no es valida"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "El formato de fecha no es valida"
                 }
             try:
                 fix_date = format_date(data.date_)
             except:
                 return {
-                    "message": "La fecha noes valida"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "El formato de fecha ingresada no es valida"
                 }
 
             if not (validate_time(data.time_)):
                 return {
-                    "message": "El tiempo no es valido"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "El formato de tiempo no es valido"
                 }
 
             if not (validate_string2(data.doctor)):
                 return {
-                    "message": "Solo se permiten letras"
+                    "status": HTTP_400_BAD_REQUEST,
+                    "message": "Incorrecto, Solo se permiten letras"
                 }
             conn.execute(appointment.update().values(date_=fix_date, time_=data.time_, place=data.place,
                          doctor=data.doctor).where(appointment.c.id_appointment == id_appointment))
             return {
-                "message": "Todo bien mi loco"
+                "status": HTTP_200_OK,
+                "message": "Operacion exitosa"
             }
         return {
+            "status": HTTP_404_NOT_FOUND,
             "message": "La cita no fue encontrada"
         }
 
@@ -1246,13 +1252,15 @@ async def update_reminder_medicament(id_user: str, id_reminder_medicament: str, 
             if (result2 != None):
                 if not (validate_date(data.date_)):
                     return {
-                        "message": "La fecha no es valida"
+                        "status": HTTP_400_BAD_REQUEST,
+                        "message": "El formato de fecha no es valida"
                     }
                 try:
                     fix_date1 = format_date(data.date_)
                 except:
                     return {
-                        "message": "La fecha no es valida"
+                        "status": HTTP_400_BAD_REQUEST,
+                        "message": "El formato de fecha no es valida"
                     }
 
                 try:
@@ -1260,21 +1268,25 @@ async def update_reminder_medicament(id_user: str, id_reminder_medicament: str, 
                         return
                 except:
                     return {
-                        "message": "El tiempo no es valido"
+                        "status": HTTP_400_BAD_REQUEST,
+                        "message": "El formato de tiempo no es valido"
                     }
 
                 conn.execute(reminder_medicament.update().values(text=data.text, date_=fix_date1, time_=data.time_).where(
                     reminder_medicament.c.id_reminder_medicament == id_reminder_medicament))
                 return {
+                    "status": HTTP_200_OK,
                     "message": "operacion exitosa"
                 }
            # except:
             return {
+                "status": HTTP_404_NOT_FOUND,
                 "message": "El recordatorio no pertenece a este usuario"
             }
 
         return {
-            "message": "Este usuario no posee un recordatorio o no existe"
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no posee un recordatorio o no existe el recordatorio"
         }
 
 
@@ -1296,9 +1308,64 @@ async def get_remindersMed_user(id_user: int):
             if (result != None):
                 return result
             return {
+                "status": HTTP_400_BAD_REQUEST,
                 "message": "El usuario no posee recordatorios"
             }
         except:
             return {
+                "status": HTTP_400_BAD_REQUEST,
                 "message": "El usuario no existe"
             }
+
+
+@root.delete("/delete-appointment/{id_appointment}")
+async def delete_appointment(id_appointment: int):
+    with engine.connect() as conn:
+        result = conn.execute(appointment.select().where(
+            appointment.c.id_appointment == id_appointment)).first()
+        if result != None:
+            try:
+                conn.execute(appointment.delete().where(
+                    appointment.c.id_appointment == id_appointment))
+
+                return {
+                    "status": HTTP_200_OK,
+                    "message": "Operacion exitosa"
+                }
+
+            except:
+                return {
+                    "status": HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": "A ocurrido un error"
+                }
+
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "la cita no existe"
+        }
+
+
+@root.delete("/delete-reminder-medicament/{id_reminder_medicament}")
+async def delete_reminderMD(id_reminder_medicament: int):
+    with engine.connect() as conn:
+        result = conn.execute(reminder_medicament.select().where(
+            reminder_medicament.c.id_reminder_medicament == id_reminder_medicament)).first()
+        if result != None:
+            try:
+                conn.execute(reminder_medicament.delete().where(
+                    reminder_medicament.c.id_reminder_medicament == id_reminder_medicament))
+                return {
+                    "status": HTTP_200_OK,
+                    "message": "Operacion exitosa"
+                }
+
+            except:
+                return {
+                    "status": HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": "Ha ocurrido un error"
+                }
+
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "El recordatorio no existe"
+        }
