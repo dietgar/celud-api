@@ -43,7 +43,6 @@ reminder_appointment = Table("reminder_appointment", meta,
 medicaments = Table("medicaments", meta,
                     Column("id_medicament", Integer,
                            primary_key=True, autoincrement=True),
-                    Column("id_user", Integer, ForeignKey("user.id_user")),
                     Column("name", String(50), nullable=False),
                     Column("description", String(150)))
 

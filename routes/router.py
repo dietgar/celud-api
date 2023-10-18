@@ -12,6 +12,14 @@ from datetime import date
 root = APIRouter()
 
 
+@root.get("/")
+async def helloWorld():
+    return {
+        "status": HTTP_200_OK,
+        "creadores": "Dietmar, Victor"
+    }
+
+
 @root.post("/users/register")
 async def register(data: Register = Body(..., embed=True)):
     with engine.connect() as conn:
@@ -104,34 +112,34 @@ async def login(data: Login = Body(..., embed=True)):
         #     }
 
 
-@root.post("/user/medicaments/{user_id}")
-async def add_medicament(user_id: int, data: Medicaments = Body(..., embed=True), medicament_data: UserMedicament = Body(..., embed=True)):
-    with engine.connect() as conn:
-        result = conn.execute(user.select().where(
-            user.c.id_user == user_id)).first()
-        if result != None:
-            if not len(data.name) > 0 and len(data.name) < 50:
-                return {
-                    "status": HTTP_400_BAD_REQUEST,
-                    "message": "El nombre no puede superar los 50 caracteres"
-                }
-            if not len(data.description) >= 0 and len(data.description) < 150:
-                return {
-                    "status": HTTP_400_BAD_REQUEST,
-                    "message": "La descripcion no puede superar los 150 caracteres"
-                }
-            new_medicament = dict(data)
-            new_medicament["id_user"] = result[0]
-            last_row_id = conn.execute(
-                medicaments.insert().values(new_medicament))
-            data_medicament = dict(medicament_data)
-            data_medicament["id_medicament"] = last_row_id.lastrowid
-            data_medicament["id_user"] = result[0]
-            return conn.execute(medicaments.select().where(medicaments.c.id_medicament == last_row_id.lastrowid)).first()
-        return {
-            "status": HTTP_404_NOT_FOUND,
-            "message": "Este usuario no existe"
-        }
+# @root.post("/user/medicaments/{user_id}")
+# async def add_medicament(user_id: int, data: Medicaments = Body(..., embed=True), medicament_data: UserMedicament = Body(..., embed=True)):
+#     with engine.connect() as conn:
+#         result = conn.execute(user.select().where(
+#             user.c.id_user == user_id)).first()
+#         if result != None:
+#             if not len(data.name) > 0 and len(data.name) < 50:
+#                 return {
+#                     "status": HTTP_400_BAD_REQUEST,
+#                     "message": "El nombre no puede superar los 50 caracteres"
+#                 }
+#             if not len(data.description) >= 0 and len(data.description) < 150:
+#                 return {
+#                     "status": HTTP_400_BAD_REQUEST,
+#                     "message": "La descripcion no puede superar los 150 caracteres"
+#                 }
+#             new_medicament = dict(data)
+#             new_medicament["id_user"] = result[0]
+#             last_row_id = conn.execute(
+#                 medicaments.insert().values(new_medicament))
+#             data_medicament = dict(medicament_data)
+#             data_medicament["id_medicament"] = last_row_id.lastrowid
+#             data_medicament["id_user"] = result[0]
+#             return conn.execute(medicaments.select().where(medicaments.c.id_medicament == last_row_id.lastrowid)).first()
+#         return {
+#             "status": HTTP_404_NOT_FOUND,
+#             "message": "Este usuario no existe"
+#         }
 
 
 @root.post("/user/reminder-medicament/{user_id}/{medicament_id}")
@@ -265,52 +273,52 @@ async def create_appointment(user_id: int, data: Appointment = Body(..., embed=T
         }
 
 
-@root.post("/users/reminder-appointment/{user_id}/{appointment_id}")
-async def create_appointment_reminder(user_id: int, appointment_id: int, data: ReminderAppointment = Body(..., embed=True)):
-    with engine.connect() as conn:
-        result = conn.execute(user.select().where(
-            user.c.id_user == user_id)).first()
-        appointment_id = conn.execute(appointment.select().where(
-            appointment.c.id_appointment == appointment_id)).first()
-        if not result != None:
-            return {
-                "status": HTTP_404_NOT_FOUND,
-                "message": "Este usuario no existe"
-            }
-        if not appointment_id != None:
-            return {
-                "status": HTTP_404_NOT_FOUND,
-                "message": "Esta cita no existe"
-            }
-        if not validate_date(data.date_):
-            return {
-                "status": HTTP_400_BAD_REQUEST,
-                "message": "Formato de fecha incorrecto"
-            }
-        try:
-            if not validate_time(data.time_):
-                return {
-                    "status": HTTP_400_BAD_REQUEST,
-                    "message": "Formato de hora incorrecto"
-                }
-        except:
-            return {
-                "status": HTTP_400_BAD_REQUEST,
-                "message": "La hora introducida no es correcta"
-            }
-        new_reminder = dict(data)
-        new_reminder["id_appointment"] = appointment_id[0]
-        new_reminder["id_user"] = result[0]
-        try:
-            new_reminder["date_"] = format_date(data.date_)
-        except:
-            return {
-                "status": HTTP_400_BAD_REQUEST,
-                "message": "Fecha fuera de rango"
-            }
-        last_row_id = conn.execute(
-            reminder_appointment.insert().values(new_reminder))
-        return conn.execute(reminder_appointment.select().where(reminder_appointment.c.id_reminder == last_row_id.lastrowid)).first()
+# @root.post("/users/reminder-appointment/{user_id}/{appointment_id}")
+# async def create_appointment_reminder(user_id: int, appointment_id: int, data: ReminderAppointment = Body(..., embed=True)):
+#     with engine.connect() as conn:
+#         result = conn.execute(user.select().where(
+#             user.c.id_user == user_id)).first()
+#         appointment_id = conn.execute(appointment.select().where(
+#             appointment.c.id_appointment == appointment_id)).first()
+#         if not result != None:
+#             return {
+#                 "status": HTTP_404_NOT_FOUND,
+#                 "message": "Este usuario no existe"
+#             }
+#         if not appointment_id != None:
+#             return {
+#                 "status": HTTP_404_NOT_FOUND,
+#                 "message": "Esta cita no existe"
+#             }
+#         if not validate_date(data.date_):
+#             return {
+#                 "status": HTTP_400_BAD_REQUEST,
+#                 "message": "Formato de fecha incorrecto"
+#             }
+#         try:
+#             if not validate_time(data.time_):
+#                 return {
+#                     "status": HTTP_400_BAD_REQUEST,
+#                     "message": "Formato de hora incorrecto"
+#                 }
+#         except:
+#             return {
+#                 "status": HTTP_400_BAD_REQUEST,
+#                 "message": "La hora introducida no es correcta"
+#             }
+#         new_reminder = dict(data)
+#         new_reminder["id_appointment"] = appointment_id[0]
+#         new_reminder["id_user"] = result[0]
+#         try:
+#             new_reminder["date_"] = format_date(data.date_)
+#         except:
+#             return {
+#                 "status": HTTP_400_BAD_REQUEST,
+#                 "message": "Fecha fuera de rango"
+#             }
+#         last_row_id = conn.execute(
+#             reminder_appointment.insert().values(new_reminder))
+#         return conn.execute(reminder_appointment.select().where(reminder_appointment.c.id_reminder == last_row_id.lastrowid)).first()
 
 # * Ruta para obtener todos los usuarios
 
