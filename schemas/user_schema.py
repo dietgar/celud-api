@@ -135,3 +135,16 @@ class ReminderAppointment(BaseModel):
 #     id_chronic_disease: int | None = None
 #     id_user: int | None = None
 #     disease_name: str
+
+
+class UpdateAppointment(BaseModel):
+    date_: str
+    time_: str
+    place: str
+    doctor: str
+
+
+class UpdateReminderMedicament(BaseModel):
+    text: str
+    date_: str
+    time_: str

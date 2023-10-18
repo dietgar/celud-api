@@ -1187,3 +1187,84 @@ async def get_reminder_appointment(appointment_id: int):
 #             "status": HTTP_404_NOT_FOUND,
 #             "message": "User doesn't exist"
 #         }
+
+@root.put("/update-appointment/{id_appointment}")
+def update_appointment(id_appointment: int, data: UpdateAppointment):
+    with engine.connect() as conn:
+        result = conn.execute(appointment.select().where(
+            appointment.c.id_appointment == id_appointment)).first()
+
+        if (result != None):
+            if not (validate_date(data.date_)):
+                return {
+                    "message": "La fecha no es valida"
+                }
+            try:
+                fix_date = format_date(data.date_)
+            except:
+                return {
+                    "message": "La fecha noes valida"
+                }
+
+            if not (validate_time(data.time_)):
+                return {
+                    "message": "El tiempo no es valido"
+                }
+
+            if not (validate_string2(data.doctor)):
+                return {
+                    "message": "Solo se permiten letras"
+                }
+            conn.execute(appointment.update().values(date_=fix_date, time_=data.time_, place=data.place,
+                         doctor=data.doctor).where(appointment.c.id_appointment == id_appointment))
+            return {
+                "message": "Todo bien mi loco"
+            }
+        return {
+            "message": "La cita no fue encontrada"
+        }
+
+
+@root.put("/update-reminder-medicament/{id_user}/{id_reminder_medicament}")
+async def update_reminder_medicament(id_user: str, id_reminder_medicament: str, data: UpdateReminderMedicament):
+    with engine.connect() as conn:
+        result1 = conn.execute(user.select().where(
+            user.c.id_user == id_user)).first()
+        result2 = conn.execute(reminder_medicament.select().where(
+            reminder_medicament.c.id_reminder_medicament == id_reminder_medicament)).first()
+
+        if (result1 != None):
+           # try:
+            if (result2 != None):
+                if not (validate_date(data.date_)):
+                    return {
+                        "message": "La fecha no es valida"
+                    }
+                try:
+                    fix_date1 = format_date(data.date_)
+                except:
+                    return {
+                        "message": "La fecha no es valida"
+                    }
+
+                try:
+                    if not (validate_time(data.time_)):
+                        return
+                except:
+                    return {
+                        "message": "El tiempo no es valido"
+                    }
+
+                conn.execute(reminder_medicament.update().values(text=data.text, date_=fix_date1, time_=data.time_).where(
+                    reminder_medicament.c.id_reminder_medicament == id_reminder_medicament))
+                return {
+                    "message": "operacion exitosa"
+                }
+           # except:
+            return {
+                "message": "El recordatorio no pertenece a este usuario"
+            }
+
+        return {
+            "message": "Este usuario no posee un recordatorio o no existe"
+        }

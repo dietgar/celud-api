@@ -51,6 +51,13 @@ def validate_string(name):
         return True
 
 
+def validate_string2(name):
+    if len(name) > 0 and len(name) < 50:
+        if re.match("^[a-zA-Z.]+$", name):
+            return True
+    return False
+
+
 def exist_phone_number(phone_number):
     with engine.connect() as conn:
         result = conn.execute(user.select().where(
