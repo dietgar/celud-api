@@ -141,8 +141,33 @@ async def login(data: Login = Body(..., embed=True)):
 #             "message": "Este usuario no existe"
 #         }
 
+@root.post("/users/info-medicament/{user_id}/{medicament_id}")
+async def add_user_medicament(user_id: int, medicament_id: int, data: UserMedicament = Body(..., embed=True)):
+    with engine.connect() as conn:
+        exist_user = conn.execute(user.select().where(
+            user.c.id_user == user_id)).first()
+        exist_medicament = conn.execute(medicaments.select().where(
+            medicaments.c.id_medicament == medicament_id)).first()
 
-@root.post("/user/reminder-medicament/{user_id}/{medicament_id}")
+        if exist_user != None:
+            if exist_medicament != None:
+                new_user_medicament = dict(data)
+                new_user_medicament["id_medicament"] = exist_medicament[0]
+                new_user_medicament["id_user"] = exist_user[0]
+                result = conn.execute(
+                    user_medicament.insert().values(new_user_medicament))
+                return conn.execute(user_medicament.select().where(user_medicament.c.id_user_medicament == result.lastrowid)).first()
+            return {
+                "status": HTTP_404_NOT_FOUND,
+                "message": "Este medicamento no existe"
+            }
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "Este usuario no existe"
+        }
+
+
+@root.post("/users/reminder-medicament/{user_id}/{medicament_id}")
 async def create_reminder_medicament(user_id: int, medicament_id: int, data: ReminderMedicament = Body(..., embed=True)):
     with engine.connect() as conn:
         result = conn.execute(user.select().where(
