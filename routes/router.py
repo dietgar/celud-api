@@ -1394,3 +1394,33 @@ async def delete_reminderMD(id_reminder_medicament: int):
             "status": HTTP_404_NOT_FOUND,
             "message": "El recordatorio no existe"
         }
+
+
+@root.delete("/user/delete-info_medicament/{id_user}/{id_medicament}")
+async def delete_user_medicament(id_user: int, id_medicament: int):
+    with engine.connect() as conn:
+        result1 = conn.execute(user.select().where(
+            user.c.id_user == id_user)).first()
+        result2 = conn.execute(user_medicament.select().where(
+            user_medicament.c.id_medicament == id_medicament)).first()
+
+        if result1 != None and result2 != None:
+            try:
+                conn.execute(user_medicament.delete().where(
+                    user_medicament.c.id_user == id_user and user_medicament.c.id_medicament == id_medicament))
+
+                return {
+                    "status": HTTP_200_OK,
+                    "message": "Operacion exitosa"
+                }
+
+            except:
+                return {
+                    "status": HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": "A ocurrido un error"
+                }
+
+        return {
+            "status": HTTP_404_NOT_FOUND,
+            "message": "El usuario no posee info-medicaments"
+        }
