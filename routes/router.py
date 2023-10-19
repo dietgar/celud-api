@@ -8,13 +8,13 @@ from validations.user_data import *
 from fastapi import Body
 from datetime import date
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+# from fastapi import FastAPI, Request
+# from fastapi.responses import HTMLResponse
+# from fastapi.staticfiles import StaticFiles
+# from fastapi.templating import Jinja2Templates
 
 
-templates = Jinja2Templates(directory="templates")
+# templates = Jinja2Templates(directory="templates")
 
 
 # from typing import List
@@ -22,12 +22,19 @@ templates = Jinja2Templates(directory="templates")
 root = APIRouter()
 
 
-@root.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "message": "Hola gente, vamos a usar html con FastAPI"
-    })
+# @root.get("/", response_class=HTMLResponse)
+# async def home(request: Request):
+#     return templates.TemplateResponse("index.html", {
+#         "request": request,
+#         "message": "Hola gente, vamos a usar html con FastAPI"
+#     })
+
+
+# RUTA RAIZ ORIGINAL → ↓
+
+@root.get("/root")
+def raiz():
+    return {"message": "Hi, I am FastAPI with a router"}
 
 
 @root.post("/users/register")
