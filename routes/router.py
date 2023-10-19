@@ -7,17 +7,27 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from validations.user_data import *
 from fastapi import Body
 from datetime import date
+
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+
+templates = Jinja2Templates(directory="templates")
+
+
 # from typing import List
 
 root = APIRouter()
 
 
-@root.get("/")
-async def helloWorld():
-    return {
-        "status": HTTP_200_OK,
-        "creadores": "Dietmar, Victor"
-    }
+@root.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "message": "Hola gente, vamos a usar html con FastAPI"
+    })
 
 
 @root.post("/users/register")
